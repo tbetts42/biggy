@@ -120,7 +120,7 @@ namespace Biggy
       string primaryKeyField = "", bool pkIsIdentityColumn = true)
     {
       ConnectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
-      TableName = tableName == "" ? this.GetType().Name : tableName;
+      TableName = tableName == "" ? this.GetType().GenericTypeArguments[0].Name : tableName;
       this.mapDbColumns();
     }
 
