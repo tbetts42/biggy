@@ -24,7 +24,7 @@ namespace Biggy
     /// <summary>
     /// Returns an Open Connection
     /// </summary>
-    internal abstract DbConnection OpenConnection();
+    protected internal abstract DbConnection OpenConnection();
     protected abstract string BuildSelect(string where, string orderBy = "", int limit = 0);
     protected abstract string GetSingleSelect(string where);
     public abstract string GetInsertReturnValueSQL();
