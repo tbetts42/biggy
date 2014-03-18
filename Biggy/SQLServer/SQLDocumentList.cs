@@ -29,7 +29,7 @@ namespace Biggy.SQLServer {
       base.Clear();
     }
 
-    internal override void TryLoadData() {
+    protected internal override void TryLoadData() {
       try {
         this.Reload();
       } catch (System.Data.SqlClient.SqlException x) {

@@ -27,7 +27,7 @@ namespace Biggy.Postgres {
     public override void SetModel() {
       this.Model = new PGTable<dynamic>(this.ConnectionStringName,tableName:this.TableName);
     }
-    internal override void TryLoadData() {
+    protected internal override void TryLoadData() {
       try {
         this.Reload();
       } catch (Npgsql.NpgsqlException x) {
