@@ -90,7 +90,7 @@ namespace Biggy {
       base.Clear();
     }
 
-    internal abstract void TryLoadData();
+    protected internal abstract void TryLoadData();
 
     /// <summary>
     /// Reloads the internal memory list
