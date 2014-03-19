@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace Biggy.Mongo
 {
     public class MongoyList<T> : InMemoryList<T> where T: new()
-    {        
+    {
+        private const string MongoIdElementName = "_id";
         public MongoyList(string host,                           
                           string database = "biggy", 
                           string collection = "list",
@@ -57,12 +60,36 @@ namespace Biggy.Mongo
             _items = _collection.FindAll().ToList();
         }
 
-        public void Remove(T thing)
+        public override bool Remove(T thing)
         {
-            // todo - best way to achieve an Id constraint?
-            var query = Query.EQ("_id", ((dynamic)thing).Id);
+            var query = GetIDQuery(thing);
             _collection.Remove(query);
-            _items.Remove(thing);
+            return _items.Remove(thing);
+        }
+
+        private static IMongoQuery GetIDQuery(T thing)
+        {
+            if (BsonClassMap.IsClassMapRegistered(typeof(T)))
+            {
+                var classMap = BsonClassMap.LookupClassMap(typeof(T));
+                if (classMap.IdMemberMap != null)
+                {
+                    var memberMap = classMap.GetMemberMapForElement(MongoIdElementName);
+                    var idValue = (BsonValue)memberMap.Getter(thing);
+                    return Query.EQ(MongoIdElementName, idValue);
+                }
+            }
+
+            // Default - use Id property
+            // This will throw an exception if your object does not have an Id property
+            return Query.EQ(MongoIdElementName, ((dynamic)thing).Id);
+        }
+
+        public override int Update(T thing)
+        {
+            var query = GetIDQuery(thing);
+            _collection.Update(query, MongoDB.Driver.Builders.Update.Replace(thing), UpdateFlags.Upsert);
+            return base.Update(thing);
         }
 
         private void Initialize(string host, int port, string database, string collection, string username, string password)

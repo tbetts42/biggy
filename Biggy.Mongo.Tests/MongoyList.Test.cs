@@ -113,7 +113,40 @@ namespace Biggy.Mongo.Tests
 
             var updatedWidget = _dbVerifier.Find(widget.Id);
             Assert.Equal(widget.Name, updatedWidget.Name);
+        }
+        
+        [Fact(DisplayName = "Mongo: Update() properly updates item in mongo collection")]
+        public void UpdateInMongo()
+        {
+            // first create a widget and add it to the collection and mongodb
+            var widget = new Widget()
+            {
+                Description = "Widget number 42",
+                Expiration = DateTime.Now.AddYears(1),
+                Name = "Widget42",
+                Price = 9.99m,
+                Size = 2
+            };
 
+            var widgets = new MongoyList<Widget>(Host, Database, Collection);
+            widgets.Add(widget);
+            widgets.Flush();
+            // find by name
+            var widgetByName = widgets.SingleOrDefault(w => w.Name == "Widget42");
+            var updatedWidget = _dbVerifier.Find(widgetByName.Id);
+            Assert.Equal(widget.Price, updatedWidget.Price);
+
+            // update it again
+            widgetByName.Price= 42.0m;
+            widgets.Flush();
+            var widgetByName2 = widgets.SingleOrDefault(w => w.Name == "Widget42");
+
+            // ID should be the same
+            Assert.Equal(widgetByName.Id, widgetByName2.Id);
+            var updatedWidget2 = _dbVerifier.Find(widgetByName2.Id);
+            Assert.Equal(42.0m, widgetByName2.Price);
+            Assert.Equal(42.0m, updatedWidget2.Price);
+            Assert.Equal(widgetByName.Price, updatedWidget2.Price);
         }
 
         [Fact(DisplayName = "Mongo: deletes a single record in memory and db")]
