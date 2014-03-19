@@ -20,7 +20,7 @@ namespace Biggy.Mongo
             FireLoadedEvents();
         }
 
-        public void Add(T thing)
+        public override void Add(T thing)
         {
             _collection.Insert(thing);
             base.Add(thing);
@@ -33,6 +33,15 @@ namespace Biggy.Mongo
             {
                 base.Add(thing);
             }
+        }
+
+        /// <summary>
+        /// Drops all data from the MongoDB Collection - BEWARE
+        /// </summary>
+        public override void Clear()
+        {
+            _collection.RemoveAll();
+            base.Clear();
         }
 
         public void Flush()
