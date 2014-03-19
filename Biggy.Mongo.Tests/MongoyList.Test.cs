@@ -135,6 +135,42 @@ namespace Biggy.Mongo.Tests
             Assert.Equal(0, _dbVerifier.Count());
         }
 
+        [Fact(DisplayName = "Mongo: removes all records in memory and db")]
+        public void Clear()
+        {
+            var widgetList = new List<Widget> {
+
+                new Widget()
+                {
+                    Description = "A widget",
+                    Expiration = DateTime.Now.AddYears(1),
+                    Name = "Widget",
+                    Price = 9.99m,
+                    Size = 2
+                },
+
+                new Widget()
+                {
+                    Description = "A second widget",
+                    Expiration = DateTime.Now.AddYears(1),
+                    Name = "Widget 2",
+                    Price = 19.99m,
+                    Size = 22
+                }
+            };
+            Assert.Equal(2, widgetList.Count);
+
+            var widgets = new MongoyList<Widget>(Host, Database, Collection);
+            widgets.Add(widgetList);
+            Assert.Equal(widgetList.Count, widgets.Count);
+            Assert.Equal(widgetList.Count, _dbVerifier.Count());
+
+            widgets.Clear();
+
+            Assert.Equal(0, widgets.Count);
+            Assert.Equal(0, _dbVerifier.Count());
+        }
+
         private const string Host = "localhost";
         private const string Database = "biggytest";
         private const string Collection = "widgets";
